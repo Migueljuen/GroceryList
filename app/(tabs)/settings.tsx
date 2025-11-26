@@ -1,14 +1,29 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import {
+  FirebaseAuthTypes
+} from '@react-native-firebase/auth';
+import { Image } from 'expo-image';
+import React, { useState } from 'react';
+import { Platform, Pressable, StyleSheet, Text } from 'react-native';
+import { logout } from '../../firebase/auth';
 
 export default function TabTwoScreen() {
+  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+  console.log(user);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setUser(null);
+    } catch (err) {
+      console.error("Error during logout:", err);
+    }
+  };
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
@@ -92,6 +107,9 @@ export default function TabTwoScreen() {
           ),
         })}
       </Collapsible>
+      <Pressable onPress={handleLogout} >
+        <Text className='text-red-500 text-center font-dm'> Logout</Text>
+      </Pressable>
     </ParallaxScrollView>
   );
 }

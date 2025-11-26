@@ -14,8 +14,33 @@ export default function RootLayout() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    "DMSans-Black": require("../assets/fonts/DMSans-Black.ttf"),
+    "DMSans-BlackItalic": require("../assets/fonts/DMSans-BlackItalic.ttf"),
+
+    "DMSans-Bold": require("../assets/fonts/DMSans-Bold.ttf"),
+    "DMSans-BoldItalic": require("../assets/fonts/DMSans-BoldItalic.ttf"),
+
+    "DMSans-ExtraBold": require("../assets/fonts/DMSans-ExtraBold.ttf"),
+    "DMSans-ExtraBoldItalic": require("../assets/fonts/DMSans-ExtraBoldItalic.ttf"),
+
+    "DMSans-ExtraLight": require("../assets/fonts/DMSans-ExtraLight.ttf"),
+    "DMSans-ExtraLightItalic": require("../assets/fonts/DMSans-ExtraLightItalic.ttf"),
+
+    "DMSans-Light": require("../assets/fonts/DMSans-Light.ttf"),
+    "DMSans-LightItalic": require("../assets/fonts/DMSans-LightItalic.ttf"),
+
+    "DMSans-Medium": require("../assets/fonts/DMSans-Medium.ttf"),
+    "DMSans-MediumItalic": require("../assets/fonts/DMSans-MediumItalic.ttf"),
+
+    "DMSans-Regular": require("../assets/fonts/DMSans-Regular.ttf"),
+
+    "DMSans-SemiBold": require("../assets/fonts/DMSans-SemiBold.ttf"),
+    "DMSans-SemiBoldItalic": require("../assets/fonts/DMSans-SemiBoldItalic.ttf"),
+
+    "DMSans-Thin": require("../assets/fonts/DMSans-Thin.ttf"),
+    "DMSans-ThinItalic": require("../assets/fonts/DMSans-ThinItalic.ttf"),
   });
+
 
 
   const handleAuthStateChanged = useCallback((user: FirebaseAuthTypes.User | null) => {
@@ -43,6 +68,7 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
 
       </Stack>

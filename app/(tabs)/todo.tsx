@@ -1,7 +1,11 @@
 import Feather from '@expo/vector-icons/Feather';
+import {
+    FirebaseAuthTypes
+} from '@react-native-firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 import {
     addTodo,
@@ -13,6 +17,10 @@ import {
 export default function ToDo() {
     const [userInput, setUserInput] = useState<string>('');
     const [todos, setTodos] = useState<Todo[]>([]);
+
+    const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+    console.log(user);
+
 
     // Handle adding a new todo
     const handleAddTodo = async () => {
@@ -66,11 +74,11 @@ export default function ToDo() {
     }, []);
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-50">
+        <SafeAreaView className="flex-1 bg-white">
             <View className="flex-1 px-6 py-4">
                 {/* Header */}
                 <View className="my-12">
-                    <Text className="text-3xl font-bold text-gray-800 text-center">
+                    <Text className="font-dm-semibold text-3xl font-bold text-black/90  text-center">
                         Todo List
                     </Text>
                     <Text className="text-gray-500 text-center mt-1">
@@ -132,6 +140,9 @@ export default function ToDo() {
                         </View>
                     )}
                 </ScrollView>
+
+
+
             </View>
         </SafeAreaView>
     );

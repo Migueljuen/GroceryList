@@ -1,11 +1,11 @@
 import {
     FirebaseAuthTypes
 } from '@react-native-firebase/auth';
-import { logout, signIn, signUp } from '../../firebase/auth';
+import { signIn } from '../../firebase/auth';
 
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Button, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 export default function Login() {
     const router = useRouter();
@@ -24,54 +24,69 @@ export default function Login() {
         }
     };
 
-    const handleSignUp = async () => {
-        try {
-            const userCredential = await signUp(email, password);
-            setUser(userCredential.user);
-        } catch (err) {
-            console.error("Error during sign up:", err);
-        }
-    };
-
-    const handleLogout = async () => {
-        try {
-            await logout();
-            setUser(null);
-        } catch (err) {
-            console.error("Error during logout:", err);
-        }
-    };
 
 
     return (
-        <SafeAreaView>
-            <View style={{ padding: 20 }}>
-                {user ? (
-                    <View>
-                        <Text>Welcome {user.email}</Text>
-                        <Button title="Logout" onPress={handleLogout} />
-                    </View>
-                ) : (
-                    <>
+        <SafeAreaView className='px-8 flex justify-around h-screen  '>
+
+            <View className='gap-12'>
+
+                {/* text */}
+                <View className='gap-2'>
+                    <Text className='font-dm-semibold tracking-tighter text-3xl text-black/90'>Let's Sign you in.</Text>
+                    <Text className='font-dm-light text-2xl text-black/50 '>Welcome back
+
+                        to
+                        {'\n'}
+                        ShareEat!</Text>
+                </View>
+
+                {/* inputs */}
+                <View className='gap-4'>
+                    <View className='gap-2'>
+                        <Text className='font-dm-medium'>Email</Text>
                         <TextInput
-                            placeholder="Email"
+                            placeholder="Enter Email"
                             value={email}
                             onChangeText={setEmail}
-                            style={{ borderWidth: 1, marginBottom: 10, padding: 5 }}
+                            className='border border-gray-400 rounded-xl p-3 font-dm'
                             autoCapitalize="none"
                         />
+                    </View>
+                    <View className='gap-2'>
+                        <Text className='font-dm-medium'>Password</Text>
                         <TextInput
-                            placeholder="Password"
+                            placeholder="Enter Password"
                             value={password}
                             secureTextEntry
                             onChangeText={setPassword}
-                            style={{ borderWidth: 1, marginBottom: 10, padding: 5 }}
+                            className='border border-gray-400 rounded-xl p-3 font-dm'
                         />
-                        <Button title="Sign Up" onPress={handleSignUp} />
-                        <Button title="Login" onPress={handleSignIn} />
-                    </>
-                )}
+                    </View>
+                </View>
             </View>
+
+
+
+            {/* <Button title="Sign Up" onPress={handleSignUp} /> */}
+            <View className='gap-4' >
+                <Pressable className='bg-[#1a1a1a] rounded-xl p-3' onPress={handleSignIn} >
+
+                    <Text className='text-white/90 text-center font-dm'>Login</Text>
+                </Pressable>
+                <Text className="text-center text-black/60 font-dm">
+                    Don't have an account yet?{" "}
+                    <Text
+                        onPress={() => router.replace('/signup')}
+                        className="text-black/90 font-dm-semibold"
+                    >
+                        Sign Up
+                    </Text>
+                </Text>
+
+
+            </View>
+
         </SafeAreaView>
     );
 }
