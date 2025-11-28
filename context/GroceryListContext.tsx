@@ -1,9 +1,10 @@
 // contexts/GroceryListContext.tsx
 import { createContext, useContext, useEffect, useState } from 'react';
 import { DUMMY_GROCERY_LISTS } from '../data/dummyGroceryLists';
+import { subscribeGroceryLists } from '../firebase/groceryLists';
 import { GroceryList } from '../types/GroceryList';
 
-const USE_DUMMY = true;
+const USE_DUMMY = false; // ⬅️ Set to false to use Firebase
 
 const GroceryListContext = createContext<{
     groceryLists: GroceryList[];
@@ -21,26 +22,19 @@ export function GroceryListProvider({ children }: { children: React.ReactNode })
             return;
         }
 
-        // Firebase implementation:
-        // import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
-        // import { db } from '../firebase';
-        //
-        // const q = query(
-        //   collection(db, 'groceryLists'),
-        //   orderBy('createdAt', 'desc')
-        // );
-        //
-        // const unsubscribe = onSnapshot(q, (snapshot) => {
-        //   const lists = snapshot.docs.map(doc => ({
-        //     id: doc.id,
-        //     ...doc.data(),
-        //     createdAt: doc.data().createdAt.toDate(),
-        //   })) as GroceryList[];
-        //   setGroceryLists(lists);
-        //   setLoading(false);
-        // });
-        //
-        // return unsubscribe;
+        // Firebase implementation
+        const unsubscribe = subscribeGroceryLists(
+            (lists) => {
+                setGroceryLists(lists);
+                setLoading(false);
+            },
+            (error) => {
+                console.error('Error loading grocery lists:', error);
+                setLoading(false);
+            }
+        );
+
+        return unsubscribe;
     }, []);
 
     return (

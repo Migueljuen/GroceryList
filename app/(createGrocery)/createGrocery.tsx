@@ -11,6 +11,8 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '../../context/AuthContext';
+import { addGroceryList } from '../../firebase/groceryLists';
 
 interface GroceryItem {
     id: string;
@@ -20,6 +22,7 @@ interface GroceryItem {
 
 export default function CreateGrocery() {
     const router = useRouter();
+    const { user } = useAuth();
     const [title, setTitle] = useState('');
     const [items, setItems] = useState<GroceryItem[]>([]);
     const [newItemText, setNewItemText] = useState('');
@@ -47,27 +50,29 @@ export default function CreateGrocery() {
         setItems(items.filter(item => item.id !== id));
     };
 
-    const handleSaveList = () => {
+    const handleSaveList = async () => {
         if (title.trim() === '') {
             Alert.alert('Error', 'Please enter a title for your grocery list');
             return;
         }
 
-        // TODO: Save to Firebase
-        // const newList = {
-        //   title,
-        //   items,
-        //   createdAt: new Date(),
-        //   owner: user.displayName,
-        // };
-        // await addGroceryList(newList);
+        try {
+            await addGroceryList(
+                title,
+                user?.displayName || 'Anonymous',
+                items
+            );
 
-        Alert.alert('Success', 'Grocery list created!', [
-            {
-                text: 'OK',
-                onPress: () => router.back(),
-            },
-        ]);
+            Alert.alert('Success', 'Grocery list created!', [
+                {
+                    text: 'OK',
+                    onPress: () => router.back(),
+                },
+            ]);
+        } catch (error) {
+            console.error('Error creating grocery list:', error);
+            Alert.alert('Error', 'Failed to create grocery list. Please try again.');
+        }
     };
 
     return (
@@ -80,7 +85,6 @@ export default function CreateGrocery() {
                     </Pressable>
 
                     <Pressable onPress={handleSaveList}>
-                        {/* <Ionicons name="share-outline" size={24} color="black" /> */}
                         <Text className='font-dm-medium text-black/90 text-lg'>Done</Text>
                     </Pressable>
                 </View>

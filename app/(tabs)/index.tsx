@@ -1,4 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import {
+    FirebaseAuthTypes
+} from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from 'react';
@@ -7,13 +10,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { GroceryListCard } from '../../components/GroceryListCard';
 import { useAuth } from '../../context/AuthContext';
 import { useGroceryLists } from '../../context/GroceryListContext';
+import { logout } from '../../firebase/auth';
 import {
     addTodo,
     deleteTodo,
     subscribeTodos,
     Todo
 } from '../../firebase/todos';
-
 export default function ToDo() {
     //todo stuff
     const [userInput, setUserInput] = useState<string>('');
@@ -25,7 +28,17 @@ export default function ToDo() {
     const navigation = useNavigation();
 
     const { user, loading: authLoading } = useAuth();
+    const [user1, setUser1] = useState<FirebaseAuthTypes.User | null>(null);
     const router = useRouter();
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            setUser1(null);
+        } catch (err) {
+            console.error("Error during logout:", err);
+        }
+    };
     // Handle adding a new todo
     const handleAddTodo = async () => {
         try {
@@ -104,14 +117,20 @@ export default function ToDo() {
         <SafeAreaView className="flex-1 bg-white">
             <View className="flex-1 px-6 py-4 gap-4">
                 {/* Header */}
-                <View className="mt-12 flex flex-col items-start ">
+                <View className='flex flex-row justify-between items-center'>
+                    <View className="mt-12 flex flex-col items-start ">
 
-                    <Text className="text-black/70 font-dm text-lg ">
-                        Ready when you are,
-                    </Text>
-                    <Text className="font-dm-semibold text-3xl tracking-tighter text-black/90">
-                        {user?.displayName || 'User'} {/* ⬅️ Display user name */}
-                    </Text>
+                        <Text className="text-black/70 font-dm text-lg ">
+                            Ready when you are,
+                        </Text>
+                        <Text className="font-dm-semibold text-3xl tracking-tighter text-black/90">
+                            {user?.displayName || 'User'} {/* ⬅️ Display user name */}
+                        </Text>
+                    </View>
+
+                    <Pressable className='mt-6' onPress={handleLogout} >
+                        <Text className='text-red-500 text-center font-dm'> Logout</Text>
+                    </Pressable>
                 </View>
 
                 {/* Search Bar */}
