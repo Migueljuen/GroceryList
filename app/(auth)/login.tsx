@@ -19,6 +19,7 @@ export default function Login() {
             const userCredential = await signIn(email, password);
             setUser(userCredential.user);
             router.replace('/(tabs)');
+            console.log(user);
         } catch (err) {
             console.error("Error during sign in:", err);
         }
@@ -33,12 +34,12 @@ export default function Login() {
 
                 {/* text */}
                 <View className='gap-2'>
-                    <Text className='font-dm-semibold tracking-tighter text-3xl text-black/90'>Let's Sign you in.</Text>
+                    <Text className='font-dm-semibold tracking-tighter text-3xl text-black/90'>Let&apos;s Sign you in.</Text>
                     <Text className='font-dm-light text-2xl text-black/50 '>Welcome back
 
                         to
                         {'\n'}
-                        ShareEat!</Text>
+                        Todo!</Text>
                 </View>
 
                 {/* inputs */}
@@ -75,7 +76,7 @@ export default function Login() {
                     <Text className='text-white/90 text-center font-dm'>Login</Text>
                 </Pressable>
                 <Text className="text-center text-black/60 font-dm">
-                    Don't have an account yet?{" "}
+                    Don&apos;t have an account yet?{" "}
                     <Text
                         onPress={() => router.replace('/signup')}
                         className="text-black/90 font-dm-semibold"

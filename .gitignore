@@ -80,5 +80,5 @@ yarn-error.*
 
 # @end expo-cli
 
-/android
-/IOS
+# /android
+# /IOS

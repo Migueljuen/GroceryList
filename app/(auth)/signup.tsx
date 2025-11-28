@@ -40,6 +40,7 @@ export default function Login() {
             const userCredential = await signUp(email, password);
             setUser(userCredential.user);
             router.replace('/(tabs)');
+            console.log(user);
         } catch (err: any) {
             console.error("Error during sign up:", err);
             // Handle Firebase errors
@@ -63,7 +64,7 @@ export default function Login() {
 
                 {/* text */}
                 <View className='gap-2'>
-                    <Text className='font-dm-semibold tracking-tighter text-3xl text-black/90'>Let's create your {'\n'}account.</Text>
+                    <Text className='font-dm-semibold tracking-tighter text-3xl text-black/90'>Let&apos;s create your {'\n'}account.</Text>
                     <Text className='font-dm-light text-2xl text-black/50 '>Welcome to ShareEat!</Text>
                 </View>
 

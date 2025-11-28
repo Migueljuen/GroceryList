@@ -1,3 +1,4 @@
+import { GroceryListProvider } from '@/context/GroceryListContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { FirebaseAuthTypes, getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
@@ -6,6 +7,7 @@ import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useState } from 'react';
 import 'react-native-reanimated';
+import { AuthProvider } from '../context/AuthContext';
 import "./global.css";
 
 export default function RootLayout() {
@@ -65,14 +67,19 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+    <GroceryListProvider>
+      <AuthProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="(createGrocery)" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
 
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+          </Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </AuthProvider>
+    </GroceryListProvider>
   );
 }
