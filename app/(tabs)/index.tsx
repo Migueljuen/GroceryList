@@ -39,6 +39,7 @@ export default function ToDo() {
             console.error("Error during logout:", err);
         }
     };
+
     // Handle adding a new todo
     const handleAddTodo = async () => {
         try {
@@ -92,7 +93,7 @@ export default function ToDo() {
 
 
     const handleListPress = (id: string) => {
-        (navigation as any).navigate('GroceryListDetails', { listId: id });
+        router.push(`/(createGrocery)/createGrocery?id=${id}`); // ⬅️ Pass ID as query param
     };
 
     const pinnedLists = groceryLists.filter(list => list.isPinned);
@@ -168,7 +169,7 @@ export default function ToDo() {
 
 
                 {/* Grocery Lists Section */}
-                <ScrollView className="flex-1 ">
+                <ScrollView >
                     {/* Pinned Section */}
                     {pinnedLists.length > 0 && (
                         <View className="mb-6">
@@ -251,6 +252,6 @@ export default function ToDo() {
 
 
             </View>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 }

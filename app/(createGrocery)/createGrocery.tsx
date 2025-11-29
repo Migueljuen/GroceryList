@@ -1,7 +1,7 @@
 // app/(createGrocery)/createGrocery.tsx
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
     Alert,
     Pressable,
@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
-import { addGroceryList } from '../../firebase/groceryLists';
+import { useGroceryLists } from '../../context/GroceryListContext';
+import { addGroceryList, updateGroceryList } from '../../firebase/groceryLists';
 
 interface GroceryItem {
     id: string;
@@ -23,9 +24,27 @@ interface GroceryItem {
 export default function CreateGrocery() {
     const router = useRouter();
     const { user } = useAuth();
-    const [title, setTitle] = useState('');
-    const [items, setItems] = useState<GroceryItem[]>([]);
+    const { groceryLists } = useGroceryLists();
+    const { id } = useLocalSearchParams<{ id?: string }>();
+
+    // Check if we're editing an existing list
+    const existingList = id ? groceryLists.find(list => list.id === id) : null;
+
+    const [title, setTitle] = useState(existingList?.title || '');
+    const [items, setItems] = useState<GroceryItem[]>(existingList?.items || []);
     const [newItemText, setNewItemText] = useState('');
+    const [isSaved, setIsSaved] = useState(!!existingList); // Already saved if editing
+    const [listId, setListId] = useState<string | null>(id || null);
+
+    // Update items when existing list changes (real-time updates)
+    useEffect(() => {
+        if (id && existingList) {
+            setTitle(existingList.title);
+            setItems(existingList.items);
+            setIsSaved(true);
+            setListId(id);
+        }
+    }, [existingList, id]);
 
     const handleAddItem = () => {
         if (newItemText.trim() === '') return;
@@ -40,14 +59,20 @@ export default function CreateGrocery() {
         setNewItemText('');
     };
 
-    const handleToggleItem = (id: string) => {
+    const handleToggleItem = (itemId: string) => {
         setItems(items.map(item =>
-            item.id === id ? { ...item, completed: !item.completed } : item
+            item.id === itemId ? { ...item, completed: !item.completed } : item
         ));
     };
 
-    const handleDeleteItem = (id: string) => {
-        setItems(items.filter(item => item.id !== id));
+    const handleItemTextChange = (itemId: string, newText: string) => {
+        setItems(items.map(item =>
+            item.id === itemId ? { ...item, text: newText } : item
+        ));
+    };
+
+    const handleDeleteItem = (itemId: string) => {
+        setItems(items.filter(item => item.id !== itemId));
     };
 
     const handleSaveList = async () => {
@@ -57,22 +82,30 @@ export default function CreateGrocery() {
         }
 
         try {
-            await addGroceryList(
-                title,
-                user?.displayName || 'Anonymous',
-                items
-            );
+            if (listId) {
+                // UPDATE existing list
+                await updateGroceryList(listId, { title, items });
+                Alert.alert('Success', 'Grocery list updated!');
+            } else {
+                // CREATE new list
+                const docRef = await addGroceryList(
+                    title,
+                    user?.displayName || 'Anonymous',
+                    items
+                );
+                setListId(docRef);
+            }
 
-            Alert.alert('Success', 'Grocery list created!', [
-                {
-                    text: 'OK',
-                    onPress: () => router.back(),
-                },
-            ]);
+            setIsSaved(true);
+
         } catch (error) {
-            console.error('Error creating grocery list:', error);
-            Alert.alert('Error', 'Failed to create grocery list. Please try again.');
+            console.error('Error saving grocery list:', error);
+            Alert.alert('Error', 'Failed to save grocery list. Please try again.');
         }
+    };
+
+    const handleShare = () => {
+        Alert.alert('Share', 'Share functionality coming soon!');
     };
 
     return (
@@ -84,9 +117,15 @@ export default function CreateGrocery() {
                         <Ionicons name="chevron-back" size={28} color="black" />
                     </Pressable>
 
-                    <Pressable onPress={handleSaveList}>
-                        <Text className='font-dm-medium text-black/90 text-lg'>Done</Text>
-                    </Pressable>
+                    {isSaved ? (
+                        <Pressable onPress={handleShare}>
+                            <Ionicons name="share-outline" size={24} color="black" />
+                        </Pressable>
+                    ) : (
+                        <Pressable onPress={handleSaveList}>
+                            <Text className='font-dm-medium text-black/90 text-lg'>Done</Text>
+                        </Pressable>
+                    )}
                 </View>
 
                 {/* Title Input */}
@@ -109,18 +148,21 @@ export default function CreateGrocery() {
                         >
                             <Pressable onPress={() => handleToggleItem(item.id)}>
                                 <Ionicons
-                                    name={item.completed ? "checkmark-circle" : "radio-button-off-outline"}
+                                    name={item.completed ? "radio-button-on-outline" : "radio-button-off-outline"}
                                     size={24}
                                     color={item.completed ? "#10B981" : "#D1D5DB"}
                                 />
                             </Pressable>
 
-                            <Text
-                                className={`flex-1 text-base border-b border-gray-200 pb-2 ${item.completed ? 'line-through text-gray-400' : 'text-black/90'
+                            <TextInput
+                                value={item.text}
+                                onChangeText={(newText) => handleItemTextChange(item.id, newText)}
+                                placeholder="Item name"
+                                placeholderTextColor="#9CA3AF"
+                                editable={!item.completed}
+                                className={`flex-1 text-base border-b border-gray-200 pb-2 ${item.completed ? 'text-black/60' : 'text-black/90'
                                     }`}
-                            >
-                                {item.text}
-                            </Text>
+                            />
 
                             <Pressable onPress={() => handleDeleteItem(item.id)}>
                                 <Ionicons
@@ -150,15 +192,6 @@ export default function CreateGrocery() {
                         />
                     </View>
                 </ScrollView>
-
-                {/* New Item Button */}
-                <Pressable
-                    onPress={handleAddItem}
-                    className="absolute bottom-24 right-6 flex-row items-center gap-2"
-                >
-                    <Ionicons name="add-circle-outline" size={28} color="black" />
-                    <Text className="font-dm-semibold text-base">New Item</Text>
-                </Pressable>
             </View>
         </SafeAreaView>
     );

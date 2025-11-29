@@ -1,6 +1,6 @@
 // contexts/GroceryListContext.tsx
 import { createContext, useContext, useEffect, useState } from 'react';
-import { DUMMY_GROCERY_LISTS } from '../data/dummyGroceryLists';
+
 import { subscribeGroceryLists } from '../firebase/groceryLists';
 import { GroceryList } from '../types/GroceryList';
 
@@ -16,12 +16,6 @@ export function GroceryListProvider({ children }: { children: React.ReactNode })
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (USE_DUMMY) {
-            setGroceryLists(DUMMY_GROCERY_LISTS);
-            setLoading(false);
-            return;
-        }
-
         // Firebase implementation
         const unsubscribe = subscribeGroceryLists(
             (lists) => {

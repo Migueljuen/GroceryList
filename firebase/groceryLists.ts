@@ -30,25 +30,26 @@ export interface GroceryList {
 const firestore = getFirestore(getApp());
 const groceryListsCollection = collection(firestore, 'groceryLists');
 
-// CREATE - Add a new grocery list
+// CREATE
 export const addGroceryList = async (
     title: string,
     owner: string,
     items: GroceryItem[] = []
-): Promise<void> => {
-    if (!title.trim()) return;
+): Promise<string> => { // ⬅️ Changed from Promise<void> to Promise<string>
+    if (!title.trim()) throw new Error('Title is required'); // ⬅️ Changed from return to throw
 
-    await addDoc(groceryListsCollection, {
+    const docRef = await addDoc(groceryListsCollection, {
         title: title.trim(),
         owner,
         items,
-
         isPinned: false,
         createdAt: serverTimestamp(),
     });
+
+    return docRef.id; // ⬅️ Return the document ID
 };
 
-// READ - Subscribe to all grocery lists
+// READ 
 export const subscribeGroceryLists = (
     onUpdate: (lists: GroceryList[]) => void,
     onError?: (error: Error) => void
@@ -73,7 +74,7 @@ export const subscribeGroceryLists = (
     );
 };
 
-// UPDATE - Update a grocery list
+// UPDATE
 export const updateGroceryList = async (
     id: string,
     updates: Partial<Omit<GroceryList, 'id' | 'createdAt'>>
@@ -82,7 +83,7 @@ export const updateGroceryList = async (
     await updateDoc(listDoc, updates);
 };
 
-// UPDATE - Toggle pin status
+// UPDATE 
 export const togglePin = async (id: string, currentPinStatus: boolean): Promise<void> => {
     const listDoc = doc(firestore, 'groceryLists', id);
     await updateDoc(listDoc, {
@@ -90,7 +91,7 @@ export const togglePin = async (id: string, currentPinStatus: boolean): Promise<
     });
 };
 
-// DELETE - Delete a grocery list
+// DELETE 
 export const deleteGroceryList = async (id: string): Promise<void> => {
     const listDoc = doc(firestore, 'groceryLists', id);
     await deleteDoc(listDoc);

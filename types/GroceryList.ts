@@ -1,12 +1,17 @@
 // types/GroceryList.ts
+
+export interface GroceryItem {
+    id: string;
+    text: string;
+    completed: boolean;
+}
 export interface GroceryList {
     id: string;
     title: string;
     owner: string;
     createdAt: Date;
     isPinned?: boolean;
-    color?: 'blue' | 'green' | 'red' | 'yellow' | 'purple';
 
-    // items?: GroceryItem[];
-    // sharedWith?: string[];
+    items: GroceryItem[];
+    sharedWith?: string[];
 }

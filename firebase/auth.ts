@@ -19,3 +19,4 @@ export const signIn = (email: string, password: string) =>
 
 //Sign Out function
 export const logout = () => signOut(auth);
+
