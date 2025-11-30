@@ -46,7 +46,7 @@ export default function CreateGrocery() {
         }
     }, [existingList, id]);
 
-    const handleAddItem = () => {
+    const handleAddItem = async () => {
         if (newItemText.trim() === '') return;
 
         const newItem: GroceryItem = {
@@ -55,26 +55,78 @@ export default function CreateGrocery() {
             completed: false,
         };
 
-        setItems([...items, newItem]);
+        const updatedItems = [...items, newItem];
+        setItems(updatedItems);
         setNewItemText('');
+
+        // Auto-save 
+        if (listId) {
+            try {
+                await updateGroceryList(listId, { items: updatedItems });
+            } catch (error) {
+                console.error('Error updating list:', error);
+            }
+        }
     };
 
-    const handleToggleItem = (itemId: string) => {
-        setItems(items.map(item =>
+    const handleToggleItem = async (itemId: string) => {
+        const updatedItems = items.map(item =>
             item.id === itemId ? { ...item, completed: !item.completed } : item
-        ));
+        );
+        setItems(updatedItems);
+
+        // Auto-save 
+        if (listId) {
+            try {
+                await updateGroceryList(listId, { items: updatedItems });
+            } catch (error) {
+                console.error('Error updating list:', error);
+            }
+        }
     };
 
-    const handleItemTextChange = (itemId: string, newText: string) => {
-        setItems(items.map(item =>
+    const handleItemTextChange = async (itemId: string, newText: string) => {
+        const updatedItems = items.map(item =>
             item.id === itemId ? { ...item, text: newText } : item
-        ));
+        );
+        setItems(updatedItems);
+
+
+        if (listId) {
+            try {
+                await updateGroceryList(listId, { items: updatedItems });
+            } catch (error) {
+                console.error('Error updating list:', error);
+            }
+        }
     };
 
-    const handleDeleteItem = (itemId: string) => {
-        setItems(items.filter(item => item.id !== itemId));
+    const handleTitleChange = async (newTitle: string) => {
+        setTitle(newTitle);
+
+        // Auto-save if editing existing list
+        if (listId && newTitle.trim()) {
+            try {
+                await updateGroceryList(listId, { title: newTitle.trim() });
+            } catch (error) {
+                console.error('Error updating title:', error);
+            }
+        }
     };
 
+    const handleDeleteItem = async (itemId: string) => {
+        const updatedItems = items.filter(item => item.id !== itemId);
+        setItems(updatedItems);
+
+
+        if (listId) {
+            try {
+                await updateGroceryList(listId, { items: updatedItems });
+            } catch (error) {
+                console.error('Error updating list:', error);
+            }
+        }
+    };
     const handleSaveList = async () => {
         if (title.trim() === '') {
             Alert.alert('Error', 'Please enter a title for your grocery list');
@@ -132,7 +184,7 @@ export default function CreateGrocery() {
                 <View className="px-6 mb-8">
                     <TextInput
                         value={title}
-                        onChangeText={setTitle}
+                        onChangeText={handleTitleChange}
                         placeholder="Title Here"
                         className="text-2xl font-dm-semibold text-black/90"
                         placeholderTextColor="#9CA3AF"
