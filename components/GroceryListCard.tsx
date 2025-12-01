@@ -47,7 +47,7 @@ export function GroceryListCard({ list, onPress }: Props) {
                         <Text className="text-sm text-black/70 font-dm">
                             {formatDate(list.createdAt)}
                         </Text>
-                        <Text className="text-sm text-black/70 font-dm">By {list.owner}</Text>
+                        <Text className="text-sm text-black/70 font-dm">By {list.email?.split('@')[0] || list.owner} </Text>
                     </View>
                 </View>
             </View>

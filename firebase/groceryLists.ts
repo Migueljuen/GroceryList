@@ -21,7 +21,7 @@ export interface GroceryItem {
 export interface GroceryList {
     id: string;
     title: string;
-    owner: string;
+    email: string;
     createdAt: Date;
     isPinned?: boolean;
     items: GroceryItem[];
@@ -33,14 +33,14 @@ const groceryListsCollection = collection(firestore, 'groceryLists');
 // CREATE
 export const addGroceryList = async (
     title: string,
-    owner: string,
+    email: string,
     items: GroceryItem[] = []
 ): Promise<string> => { // ⬅️ Changed from Promise<void> to Promise<string>
     if (!title.trim()) throw new Error('Title is required'); // ⬅️ Changed from return to throw
 
     const docRef = await addDoc(groceryListsCollection, {
         title: title.trim(),
-        owner,
+        email,
         items,
         isPinned: false,
         createdAt: serverTimestamp(),

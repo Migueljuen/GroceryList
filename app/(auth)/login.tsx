@@ -39,7 +39,7 @@ export default function Login() {
 
                         to
                         {'\n'}
-                        Todo!</Text>
+                        ShareEat!</Text>
                 </View>
 
                 {/* inputs */}

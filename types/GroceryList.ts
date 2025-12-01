@@ -11,7 +11,7 @@ export interface GroceryList {
     owner: string;
     createdAt: Date;
     isPinned?: boolean;
-
+    email: string;
     items: GroceryItem[];
     sharedWith?: string[];
 }

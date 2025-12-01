@@ -142,7 +142,7 @@ export default function CreateGrocery() {
                 // CREATE new list
                 const docRef = await addGroceryList(
                     title,
-                    user?.displayName || 'Anonymous',
+                    user?.email || 'Anonymous',
                     items
                 );
                 setListId(docRef);

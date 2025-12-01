@@ -124,8 +124,8 @@ export default function ToDo() {
                         <Text className="text-black/70 font-dm text-lg ">
                             Ready when you are,
                         </Text>
-                        <Text className="font-dm-semibold text-3xl tracking-tighter text-black/90">
-                            {user?.displayName || 'User'} {/* ⬅️ Display user name */}
+                        <Text className="font-dm-semibold text-3xl tracking-tighter text-black/90 capitalize w-full">
+                            {user?.email?.split('@')[0] || 'User'}
                         </Text>
                     </View>
 
