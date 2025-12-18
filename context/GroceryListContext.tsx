@@ -1,10 +1,8 @@
-// contexts/GroceryListContext.tsx
+import auth from '@react-native-firebase/auth';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 import { subscribeGroceryLists } from '../firebase/groceryLists';
 import { GroceryList } from '../types/GroceryList';
-
-const USE_DUMMY = false; // ⬅️ Set to false to use Firebase
 
 const GroceryListContext = createContext<{
     groceryLists: GroceryList[];
@@ -16,19 +14,41 @@ export function GroceryListProvider({ children }: { children: React.ReactNode })
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Firebase implementation
-        const unsubscribe = subscribeGroceryLists(
-            (lists) => {
-                setGroceryLists(lists);
-                setLoading(false);
-            },
-            (error) => {
-                console.error('Error loading grocery lists:', error);
-                setLoading(false);
-            }
-        );
+        let unsubscribeLists: (() => void) | undefined;
 
-        return unsubscribe;
+        // Listen to auth state
+        const unsubscribeAuth = auth().onAuthStateChanged(user => {
+            // Cleanup old Firestore listener
+            if (unsubscribeLists) {
+                unsubscribeLists();
+                unsubscribeLists = undefined;
+            }
+
+            if (!user) {
+                // Logged out
+                setGroceryLists([]);
+                setLoading(false);
+                return;
+            }
+
+            // Logged in → subscribe
+            setLoading(true);
+            unsubscribeLists = subscribeGroceryLists(
+                lists => {
+                    setGroceryLists(lists);
+                    setLoading(false);
+                },
+                error => {
+                    console.error('Error loading grocery lists:', error);
+                    setLoading(false);
+                }
+            );
+        });
+
+        return () => {
+            unsubscribeAuth();
+            if (unsubscribeLists) unsubscribeLists();
+        };
     }, []);
 
     return (

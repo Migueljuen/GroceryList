@@ -157,8 +157,17 @@ export default function CreateGrocery() {
     };
 
     const handleShare = () => {
-        Alert.alert('Share', 'Share functionality coming soon!');
+        if (!listId) {
+            Alert.alert('Save first', 'Please save the list before sharing.');
+            return;
+        }
+
+        router.push({
+            pathname: '/(modal)/manageMembers',
+            params: { listId },
+        });
     };
+
 
     return (
         <SafeAreaView className="flex-1 bg-white">

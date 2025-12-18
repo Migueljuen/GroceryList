@@ -4,23 +4,15 @@ import {
 } from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GroceryListCard } from '../../components/GroceryListCard';
 import { useAuth } from '../../context/AuthContext';
 import { useGroceryLists } from '../../context/GroceryListContext';
 import { logout } from '../../firebase/auth';
-import {
-    addTodo,
-    deleteTodo,
-    subscribeTodos,
-    Todo
-} from '../../firebase/todos';
+
 export default function ToDo() {
-    //todo stuff
-    const [userInput, setUserInput] = useState<string>('');
-    const [todos, setTodos] = useState<Todo[]>([]);
 
     // grocery list stuff
 
@@ -40,55 +32,9 @@ export default function ToDo() {
         }
     };
 
-    // Handle adding a new todo
-    const handleAddTodo = async () => {
-        try {
-            await addTodo(userInput);
-            setUserInput('');
-        } catch (error) {
-            console.error('Error adding todo:', error);
-            Alert.alert('Error', 'Failed to add todo. Please try again.');
-
-        }
-    };
-
-    // Handle deleting a todo
-    const handleDeleteTodo = async (id: string) => {
-        Alert.alert(
-            'Delete todo',
-            'Are you sure you want to delete this todo?',
-            [
-                {
-                    text: 'Cancel',
-                    style: 'cancel',
-                },
-                {
-                    text: 'Delete',
-                    style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            await deleteTodo(id);
-                        } catch (error) {
-                            console.error('Error deleting todo:', error);
-                            Alert.alert('Error', 'Failed to delete todo. Please try again.');
-                        }
-                    },
-                },
-            ]
-        );
-    };
-
-    // Read todo
-    useEffect(() => {
-        const unsubscribe = subscribeTodos(
-            (todosList) => setTodos(todosList),
-            (error) => {
-                Alert.alert('Error', 'Failed to load todos. Please check your connection.');
-            }
-        );
-
-        return unsubscribe;
-    }, []);
+    const handleNotification = async () => {
+        router.push('/(invites)/invites')
+    }
 
 
 
@@ -128,10 +74,16 @@ export default function ToDo() {
                             {user?.email?.split('@')[0] || 'User'}
                         </Text>
                     </View>
+                    <View className='flex flex-row gap-8'>
+                        <Pressable className='mt-6' onPress={handleNotification} >
+                            <Ionicons name="notifications-outline" size={20} color="#9CA3AF" />
 
-                    <Pressable className='mt-6' onPress={handleLogout} >
-                        <Text className='text-red-500 text-center font-dm'> Logout</Text>
-                    </Pressable>
+                        </Pressable>
+                        <Pressable className='mt-6' onPress={handleLogout} >
+                            <Ionicons name="log-out-outline" size={20} color="#9CA3AF" />
+
+                        </Pressable>
+                    </View>
                 </View>
 
                 {/* Search Bar */}
@@ -147,25 +99,6 @@ export default function ToDo() {
                     </View>
                 </View>
 
-                {/* Input Section */}
-
-                <View className="mb-6 hidden">
-                    <View className="flex-row gap-4 items-center">
-                        <TextInput
-                            value={userInput}
-                            onChangeText={setUserInput}
-                            className="flex-1 px-4 py-3 rounded-lg border-b border-gray-400"
-                            placeholder="Enter a new task"
-                            onSubmitEditing={handleAddTodo}
-                            returnKeyType="done"
-                        />
-
-                        {/* <CirclePlus size={32} color="black" onPress={handleAddTodo} /> */}
-                        <Ionicons onPress={handleAddTodo} name="add-circle-outline" size={28} color="black" />
-
-
-                    </View>
-                </View>
 
 
                 {/* Grocery Lists Section */}
@@ -209,45 +142,6 @@ export default function ToDo() {
                     <Ionicons name="add-circle-outline" size={28} color="black" />
                     <Text className='font-dm-semibold'>New list</Text>
                 </Pressable>
-
-                {/* Todo List */}
-                <ScrollView className="flex-1 hidden" showsVerticalScrollIndicator={false}>
-                    {todos.length === 0 ? (
-                        <View className="flex-1 justify-center items-center py-12">
-                            <Text className="text-gray-400 text-lg text-center">
-                                No todos yet!{'\n'}Add one above to get started.
-                            </Text>
-                        </View>
-                    ) : (
-                        <View className="space-y-3">
-                            {todos.map((todo) => (
-                                <View
-                                    key={todo.id}
-                                    className="bg-white p-4 mt-2 rounded-lg flex-row items-center justify-between"
-                                >
-
-                                    <Text
-                                        className={`flex-1 text-black/90 border-b border-gray-200 py-4 ${todo.completed ? 'line-through text-gray-500' : ''
-                                            }`}
-                                    >
-                                        {todo.text}
-                                    </Text>
-
-                                    <TouchableOpacity
-                                        onPress={() => handleDeleteTodo(todo.id)}
-                                        className=""
-                                    >
-                                        <Ionicons
-                                            name="radio-button-off-outline"
-                                            size={24}
-                                            color="#2f2f2f"
-                                        />
-                                    </TouchableOpacity>
-                                </View>
-                            ))}
-                        </View>
-                    )}
-                </ScrollView>
 
 
 
